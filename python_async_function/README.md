@@ -26,7 +26,7 @@ Write an asynchronous coroutine that takes in an integer argument (max_delay, wi
 
 Use the `random` module.
 
-# Task 1: Let's execute multiple coroutines at the same time with async
+#### Task 1: Let's execute multiple coroutines at the same time with async
 
 ## Description
 
