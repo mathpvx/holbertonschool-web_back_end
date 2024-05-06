@@ -1,0 +1,1 @@
+This is Holberton School project for ES6 Basics.
