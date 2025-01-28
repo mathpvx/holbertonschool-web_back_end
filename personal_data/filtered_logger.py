@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import re
 """
 Function that returns the log message obfuscated
 """
+import re
 
 
 def filter_datum(fields, redaction, message, separator):
