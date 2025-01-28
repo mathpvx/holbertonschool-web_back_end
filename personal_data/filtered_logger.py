@@ -9,5 +9,5 @@ def filter_datum(fields, redaction, message, separator):
         # 'anything but the separator'
         pattern = fr"{re.escape(field)}=([^({separator})]+)"
         message = re.sub(pattern, f"{field}={redaction}", message)
-
-        return message
+    
+    return message
