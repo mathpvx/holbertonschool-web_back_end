@@ -6,7 +6,7 @@ import re
 
 
 def filter_datum(
-    fields: List[str], 
+    fields: list[str], 
     redaction: str, 
     message: str, 
     separator: str
