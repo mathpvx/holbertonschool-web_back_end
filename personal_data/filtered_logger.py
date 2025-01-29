@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Function that returns the log message obfuscated
 """
