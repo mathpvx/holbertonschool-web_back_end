@@ -7,6 +7,9 @@ import logging
 import re
 from typing import List
 
+# define fields that contain personally identifiable information
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
+
 
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """obfuscates fields in a log message using regex."""
@@ -30,3 +33,16 @@ class RedactingFormatter(logging.Formatter):
         """redacts sensitive fields from log messages"""
         record.msg = filter_datum(self.fields, self.REDACTION, record.msg, self.SEPARATOR)
         return super().format(record)
+
+
+def get_logger() -> logging.Logger:
+    """returns a logger named 'user_data' with a redacting formatter"""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False  # prevent logs from propagating to parent loggers
+    
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
+    
+    logger.addHandler(stream_handler)
+    return logger
