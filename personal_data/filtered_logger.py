@@ -5,6 +5,8 @@ Filtered Logger module.
 
 import logging
 import re
+import os
+import mysql.connector
 from typing import List
 
 # define fields that contain personally identifiable information
@@ -31,7 +33,7 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """redacts sensitive fields from log messages"""
-        record.msg = filter_datum(self.fields, self.REDACTION, record.msg, self.SEPARATOR)
+        record.msg = filter_datum(self.fields, self.REDACTION, record.getMessage(), self.SEPARATOR)
         return super().format(record)
 
 
@@ -40,9 +42,24 @@ def get_logger() -> logging.Logger:
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
     logger.propagate = False  # prevent logs from propagating to parent loggers
-    
+
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
-    
+    stream_handler.setFormatter(RedactingFormatter(list(PII_FIELDS)))  # convert tuple to list
+
     logger.addHandler(stream_handler)
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """returns a connector to a MySQL database"""
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    return mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name
+    )
