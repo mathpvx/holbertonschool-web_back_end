@@ -15,8 +15,10 @@ PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """obfuscates fields in a log message using regex."""
-    return re.sub(fr'({"|".join(map(re.escape, fields))})=[^{separator}]*', 
-                  rf'\1={redaction}', message)
+    for f in fields:
+        pattern = f"{re.escape(f)}=.*?{re.escape(separator)}"
+        message = re.sub(pattern, f"{f}={redaction}{separator}", message)
+    return message
 
 
 class RedactingFormatter(logging.Formatter):
@@ -63,3 +65,24 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         host=host,
         database=db_name
     )
+
+
+def main() -> None:
+    """retrieves user data from the db and logs it with redacted fields"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")  # get all users
+    field_names = [desc[0] for desc in cursor.description]  # get column names
+
+    logger = get_logger()
+
+    for row in cursor:
+        row_str = "; ".join(f"{field}={value}" for field, value in zip(field_names, row))
+        logger.info(row_str)
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
