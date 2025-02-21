@@ -18,18 +18,31 @@ def view_all_users() -> str:
 
 @app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
 def view_one_user(user_id: str = None) -> str:
-    """ GET /api/v1/users/:id
+    """ GET /api/v1/users/<user_id>
+
     Path parameter:
-      - User ID
+      - User ID or "me"
+
     Return:
       - User object JSON represented
       - 404 if the User ID doesn't exist
+      - 404 if "me" is used but no user is authenticated
+      - Authenticated user data if "me" is used and authenticated
     """
     if user_id is None:
         abort(404)
+
+    # Handle the case where user_id is "me"
+    if user_id == "me":
+        if request.current_user is None:
+            abort(404)
+        return jsonify(request.current_user.to_json())
+
+    # Normal case: Get user by ID
     user = User.get(user_id)
     if user is None:
         abort(404)
+
     return jsonify(user.to_json())
 
 
