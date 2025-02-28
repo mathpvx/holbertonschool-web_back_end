@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Session Authentication module """
 import uuid
+from flask import request
 from api.v1.auth.auth import Auth
 from models.user import User
 
@@ -12,13 +13,7 @@ class SessionAuth(Auth):
     user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
-        """
-        Creates a new session ID for a given user_id.
-
-        Returns:
-            - None if user_id is None or not a string
-            - A newly generated session ID (str) otherwise
-        """
+        """ Creates a new session ID for a given user_id """
         if user_id is None or not isinstance(user_id, str):
             return None
 
