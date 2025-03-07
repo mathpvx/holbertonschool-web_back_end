@@ -52,3 +52,19 @@ class DB:
             raise InvalidRequestError
 
         return query
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """method that updates a user if found"""
+
+        query = self._session.query(User).filter_by(id=user_id).first()
+
+        for key, value in kwargs.items():
+            if hasattr(query, key):
+                setattr(query, key, value)
+            else:
+                raise ValueError
+
+        self._session.commit()
+        self._session.refresh(query)
+
+        return None
