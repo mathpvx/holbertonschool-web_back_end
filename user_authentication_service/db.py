@@ -3,6 +3,7 @@
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import NoResultFound, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
@@ -38,3 +39,15 @@ class DB:
         self._session.refresh(new_user)
 
         return new_user
+
+    def find_user_by(self, **kwargs):
+        """method that finds the first match in User table with whatever argument in input"""
+        query = self._session.query(User).filter_by(**kwargs).first()
+
+        if query is None:
+            raise NoResultFound()
+
+        if not kwargs:
+            raise InvalidRequestError
+
+        return query
