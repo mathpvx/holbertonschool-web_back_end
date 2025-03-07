@@ -41,7 +41,8 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """method that finds the first match in User table with whatever argument in input"""
+        """method that finds the first match in
+        User table with whatever argument in input"""
         query = self._session.query(User).filter_by(**kwargs).first()
 
         if query is None:
