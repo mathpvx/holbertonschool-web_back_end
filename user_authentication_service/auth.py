@@ -6,16 +6,17 @@ from user import User
 from sqlalchemy.exc import NoResultFound
 import bcrypt
 
+def _hash_password(password: str) -> bytes:
+	""" method that takes in a password string arg and returns bytes"""
+	salt = bcrypt.gensalt()
+	hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+	return hashed_password
+
 
 class Auth:
     def __init__(self):
         self._db = DB()
 
-    def _hash_password(self, password: str) -> bytes:
-        """ method that takes in a password string arg and returns bytes"""
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed_password
 
     def register_user(self, email: str, password: str) -> User:
         """method that checks if the user already exists
@@ -26,6 +27,6 @@ class Auth:
                 raise ValueError("User {} already exists".format(email))
 
         except NoResultFound:
-            hashed_password = self._hash_password(password)
+            hashed_password = _hash_password(password)
             new_user = self._db.add_user(email, hashed_password)
             return new_user
