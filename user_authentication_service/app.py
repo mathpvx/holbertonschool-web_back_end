@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-""" flask app with user registration and login endpoint """
+""" flask app with user registration, login, and logout endpoints """
 
-from flask import Flask, request, jsonify, abort, make_response
+from flask import Flask, request, jsonify, abort, redirect
 from auth import Auth
 
 
@@ -38,9 +38,25 @@ def login():
         abort(401)
 
     session_id = AUTH.create_session(email)
-    response = make_response(jsonify({"email": email, "message": "logged in"}))
+    response = jsonify({"email": email, "message": "logged in"})
     response.set_cookie("session_id", session_id)
     return response
+
+
+@app.route("/sessions", methods=["DELETE"])
+def logout():
+    """logs out a user by deleting their session and redirecting to /"""
+    session_id = request.cookies.get("session_id")
+
+    if not session_id:
+        abort(403)
+
+    user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        abort(403)
+
+    AUTH.destroy_session(user.id)
+    return redirect("/")
 
 
 if __name__ == "__main__":
