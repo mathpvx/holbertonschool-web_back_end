@@ -8,10 +8,10 @@ import bcrypt
 import uuid
 
 
-def _hash_password(password: str) -> bytes:
-    """method that takes in a password string arg and returns bytes"""
+def _hash_password(password: str) -> str:
+    """method that takes in a password string arg and returns a hashed string"""
     salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode("utf-8"), salt)
+    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
 
 def _generate_uuid() -> str:
@@ -34,7 +34,7 @@ class Auth:
             if existing_user:
                 raise ValueError("User {} already exists".format(email))
         except NoResultFound:
-            hashed_password = _hash_password(password).decode("utf-8")
+            hashed_password = _hash_password(password)
             return self._db.add_user(email, hashed_password)
 
     def valid_login(self, email: str, password: str) -> bool:
@@ -84,3 +84,13 @@ class Auth:
             return reset_token
         except NoResultFound:
             raise ValueError("User not found")
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """uses reset token to find user and updates the password"""
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+            hashed_password = _hash_password(password)
+            self._db.update_user(user.id, hashed_password=hashed_password,
+                                 reset_token=None)
+        except NoResultFound:
+            raise ValueError("Invalid reset token")
