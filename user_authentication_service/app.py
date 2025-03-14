@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-""" flask app with user registration, login, logout, and profile endpoints """
+""" flask app with user registration, login, logout, profile,
+and reset password endpoints """
 
 from flask import Flask, request, jsonify, abort
 from auth import Auth
@@ -72,6 +73,21 @@ def profile():
         abort(403)
 
     return jsonify({"email": user.email}), 200
+
+
+@app.route("/reset_password", methods=["POST"])
+def get_reset_password_token():
+    """generates a password reset token for a valid email"""
+    email = request.form.get("email")
+
+    if not email:
+        return jsonify({"message": "Missing email"}), 400
+
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": reset_token}), 200
+    except ValueError:
+        abort(403)
 
 
 if __name__ == "__main__":
