@@ -9,7 +9,8 @@ import uuid
 
 
 def _hash_password(password: str) -> str:
-    """method that takes in a password string arg and returns a hashed string"""
+    """method that takes in a password
+    string arg and returns a hashed string"""
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
