@@ -27,8 +27,8 @@ class Auth:
         self._db = DB()
 
     def register_user(self, email: str, password: str) -> User:
-        """method that checks if the
-        user already exists and creates one if not the case"""
+        """method that checks if the user already exists and creates one
+        if not the case"""
         try:
             existing_user = self._db.find_user_by(email=email)
             if existing_user:
@@ -41,9 +41,18 @@ class Auth:
         """check if the email and password provided match a registered user"""
         try:
             user = self._db.find_user_by(email=email)
-            return bcrypt.checkpw(
-                password.encode("utf-8"),
-                user.hashed_password.encode("utf-8")
-            )
+            return bcrypt.checkpw(password.encode("utf-8"),
+                                  user.hashed_password.encode("utf-8"))
         except NoResultFound:
             return False
+
+    def create_session(self, email: str) -> str:
+        """finds the user by email, generates a session id, updates the user
+        session_id in the database and returns the session id"""
+        try:
+            user = self._db.find_user_by(email=email)
+            session_id = _generate_uuid()
+            self._db.update_user(user.id, session_id=session_id)
+            return session_id
+        except NoResultFound:
+            return None
