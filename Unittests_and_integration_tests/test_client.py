@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test GithubOrgClient.org with parameterized expand and patch
+Test GithubOrgClient.org with parameterized inputs and mock
 """
 
 import unittest
@@ -10,21 +10,21 @@ from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """Test class for GithubOrgClient.org"""
+    """Test class for GithubOrgClient.org method"""
 
     @parameterized.expand([
-        ("google",),
-        ("abc",),
+        ("google", "google"),
+        ("abc", "abc"),
     ])
-    def test_org(self, org_name):
-        """Test org method returns correct payload"""
-        test_payload = {"name": org_name, "id": 123}
+    @patch("client.get_json")
+    def test_org(self, name, org_name, mock_get_json):
+        """Test that .org returns expected data"""
+        test_payload = {"login": org_name, "id": 123}
+        mock_get_json.return_value = test_payload
 
-        with patch("client.get_json", return_value=test_payload) as mock_get_json:
-            client = GithubOrgClient(org_name)
-            result = client.org
+        client = GithubOrgClient(org_name)
+        result = client.org
 
-            mock_get_json.assert_called_once_with(
-                f"https://api.github.com/orgs/{org_name}"
-            )
-            self.assertEqual(result, test_payload)
+        expected_url = f"https://api.github.com/orgs/{org_name}"
+        mock_get_json.assert_called_once_with(expected_url)
+        self.assertEqual(result, test_payload)
