@@ -22,15 +22,15 @@ class Config:
 app = Flask(__name__)
 app.config.from_object(Config)
 
-babel = Babel()
-babel.init_app(app, locale_selector=lambda: get_locale())
-
-
 def get_locale():
     """
     Select the best matching language based on the request.
     """
     return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+
+babel = Babel()
+babel.init_app(app, locale_selector=get_locale)
 
 
 @app.route('/')
