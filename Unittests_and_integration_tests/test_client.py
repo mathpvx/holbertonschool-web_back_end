@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Testing GithubOrgClient.org method with mock and parameterized inputs
+Testing GithubOrgClient.org method with parameterized inputs and mock
 """
 
 import unittest
@@ -16,19 +16,14 @@ class TestGithubOrgClient(unittest.TestCase):
         ("google",),
         ("abc",),
     ])
-    @patch('client.get_json')
-    def test_org(self, org_name, mock_get):
-        # Setup: fake payload returned by get_json
+    def test_org(self, org_name):
+        """Test GithubOrgClient.org returns expected data and calls get_json"""
         fake_response = {"name": org_name, "id": 42}
-        mock_get.return_value = fake_response
 
-        # Create client and call .org()
-        client = GithubOrgClient(org_name)
-        result = client.org
+        with patch("client.get_json", return_value=fake_response) as mock_get:
+            client = GithubOrgClient(org_name)
+            result = client.org
 
-        # Make sure get_json was called once with correct URL
-        expected_url = f"https://api.github.com/orgs/{org_name}"
-        mock_get.assert_called_once_with(expected_url)
-
-        # Check if result matches what we mocked
-        self.assertEqual(result, fake_response)
+            expected_url = f"https://api.github.com/orgs/{org_name}"
+            mock_get.assert_called_once_with(expected_url)
+            self.assertEqual(result, fake_response)
