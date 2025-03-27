@@ -22,6 +22,7 @@ class Config:
 app = Flask(__name__)
 app.config.from_object(Config)
 
+
 def get_locale():
     """
     Select the best matching language based on the request.
