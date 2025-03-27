@@ -9,6 +9,7 @@ with one route that renders a basic HTML template.
 from flask import Flask, render_template
 from flask_babel import Babel
 
+
 class Config:
     """
     Config class for Flask app and Babel.
