@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Testing GithubOrgClient.org method with parameterized inputs and mock
+Test GithubOrgClient.org with parameterized expand and patch
 """
 
 import unittest
@@ -10,20 +10,21 @@ from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """Tests for GithubOrgClient"""
+    """Test class for GithubOrgClient.org"""
 
     @parameterized.expand([
         ("google",),
         ("abc",),
     ])
     def test_org(self, org_name):
-        """Test GithubOrgClient.org returns expected data and calls get_json"""
-        fake_response = {"name": org_name, "id": 42}
+        """Test org method returns correct payload"""
+        test_payload = {"name": org_name, "id": 123}
 
-        with patch("client.get_json", return_value=fake_response) as mock_get:
+        with patch("client.get_json", return_value=test_payload) as mock_get_json:
             client = GithubOrgClient(org_name)
             result = client.org
 
-            expected_url = f"https://api.github.com/orgs/{org_name}"
-            mock_get.assert_called_once_with(expected_url)
-            self.assertEqual(result, fake_response)
+            mock_get_json.assert_called_once_with(
+                f"https://api.github.com/orgs/{org_name}"
+            )
+            self.assertEqual(result, test_payload)
