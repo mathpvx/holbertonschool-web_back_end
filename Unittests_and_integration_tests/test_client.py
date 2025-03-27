@@ -40,7 +40,6 @@ class TestGithubOrgClient(unittest.TestCase):
         test_url = "https://api.github.com/orgs/test-org/repos"
         mock_org_dict = {"repos_url": test_url}
 
-        # Patch the .org property to return a real dict
         with patch.object(GithubOrgClient, "org", new=mock_org_dict):
             client = GithubOrgClient("test-org")
             result = client._public_repos_url
@@ -69,6 +68,17 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(result, expected_result)
 
             mock_get_json.assert_called_once_with(test_url)
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self, repo, license_key, expected):
+        """
+        Test that has_license returns correct boolean.
+        """
+        result = GithubOrgClient.has_license(repo, license_key)
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
