@@ -1,0 +1,1 @@
+This is the readme file for the Holberton Project i18n
