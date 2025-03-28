@@ -1,19 +1,11 @@
 #!/usr/bin/env python3
-"""Flask app with user login mock and localization"""
-
-from flask import Flask, render_template, request, g
-from flask_babel import Babel, _
-from typing import Optional, Dict
+""" Flask server setup"""
 
 
-class Config:
-    """App configuration"""
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
+from flask import Flask, g, render_template, request
+from flask_babel import Babel
 
 
-# Mock user database
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
     2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
@@ -22,41 +14,46 @@ users = {
 }
 
 
-def get_locale() -> str:
-    """Determine best-matching locale"""
-    locale = request.args.get('locale')
-    if locale in Config.LANGUAGES:
-        return locale
+class Config():
+    """ Class to configure babel """
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+
+def get_locale():
+    """ use the locale from the user setttings"""
+    if "locale" in request.args and request.args['locale'] in Config.LANGUAGES:
+        return request.args['locale']
     return request.accept_languages.best_match(Config.LANGUAGES)
 
 
-def get_user() -> Optional[Dict]:
-    """Retrieve user from mock db via login_as param"""
-    try:
-        user_id = int(request.args.get('login_as'))
+def get_user():
+    """ Retrieve user information from login_as parameter"""
+    if "login_as" in request.args:
+        user_id = int(request.args['login_as'])
         return users.get(user_id)
-    except (TypeError, ValueError):
-        return None
+    return None
 
 
 app = Flask(__name__)
+babel = Babel(app)
 app.config.from_object(Config)
-
-babel = Babel()
 babel.init_app(app, locale_selector=get_locale)
 
 
 @app.before_request
 def before_request():
-    """Run before each request to set user context"""
+    """Set user as global in Flask g"""
     g.user = get_user()
 
 
 @app.route('/')
 def index():
-    """Render index page"""
+    """ Return to the main page"""
     return render_template('5-index.html')
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
+    
