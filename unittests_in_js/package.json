@@ -1,0 +1,21 @@
+{
+  "name": "unittests_in_js",
+  "version": "1.0.0",
+  "description": "This is the readme file for the Unittests in JS Holberton School project.",
+  "main": "0-calcul.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^11.2.2"
+  },
+  "dependencies": {
+  "mocha": "^11.2.2"
+  },
+"scripts": {
+  "test": "mocha"
+  }
+}
