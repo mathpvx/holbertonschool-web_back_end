@@ -9,12 +9,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/cart/:id(\\d+)', (req, res) => {
-  const id = req.params.id;
-  res.send(`Payment methods for cart ${id}`);
+  res.send(`Payment methods for cart ${req.params.id}`);
 });
 
 app.get('/available_payments', (req, res) => {
-  res.json({
+  res.status(200).json({
     payment_methods: {
       credit_cards: true,
       paypal: false
@@ -23,12 +22,8 @@ app.get('/available_payments', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const userName = req.body.userName;
-  if (userName) {
-    res.send(`Welcome ${userName}`);
-  } else {
-    res.status(400).send('Missing userName');
-  }
+  const { userName } = req.body;
+  res.status(200).send(`Welcome ${userName}`);
 });
 
 app.listen(PORT, () => {
